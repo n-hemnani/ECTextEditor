@@ -100,8 +100,8 @@ private:
 // A textview implementation
 // This is based on the simple Kilo code from GitHub
 //
-// ECTextViewImp provides basci functionalities for a text view
-// (1) Display a number of rows onto scrreen (and refresh the current view after updates)
+// ECTextViewImp provides basic functionalities for a text view
+// (1) Display a number of rows onto screen (and refresh the current view after updates)
 // (2) Cursor management: display cursor, and allow cursor movement
 // (3) Key stroke event handling: notify clients (observers) that a key has been pressed (see below)
 //
@@ -128,7 +128,7 @@ public:
     // Show the view. This would enter a forever loop, until quit is set
     void Show();
     
-    // Write the text for the entire wiindow including cursor onto console
+    // Write the text for the entire window including cursor onto console
     // Invoke this function after you make changes to your document.
     // Refreshing entire window for any document update seems excessive; but this is how the code works
     void Refresh();

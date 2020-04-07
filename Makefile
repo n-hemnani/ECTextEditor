@@ -1,5 +1,6 @@
 CPPFILES = ECEditorTest.cpp\
  ECTextViewImp.cpp\
+ Editor.cpp\
 
 HFILES = $(CPPFILES:.cpp=.h)
 

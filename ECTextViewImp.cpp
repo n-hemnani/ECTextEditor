@@ -208,6 +208,8 @@ void ECTextViewImp :: Show()
         if( keyLastPressed == CTRL_Q)
         {
             Quit();
+            for(int i = 0; i < 50; i++)
+	            cout << endl;
             break;
         }
         
