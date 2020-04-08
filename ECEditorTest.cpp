@@ -9,7 +9,7 @@ using namespace  std;
 
 int main(int argc, char *argv[])
 {
-    Editor editor = Editor();
+    Editor editor;
     return 0;
 
 
