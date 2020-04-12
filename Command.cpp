@@ -1,5 +1,5 @@
 #include "Command.h"
-#include "ECTextDocument.h"
+//#include "ECTextDocument.h"
 #include <vector>
 
 // ******************************************************
