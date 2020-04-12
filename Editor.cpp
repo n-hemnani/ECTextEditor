@@ -4,6 +4,10 @@
 
 using namespace std;
 
+// ****************************************************
+// Constructor, Update(), and other basic functionality
+// ****************************************************
+
  // constructor to initialize the window and the observer
 Editor::Editor() {
     numRows = 0;
@@ -26,13 +30,32 @@ Editor::Editor() {
 
 void Editor::Update() {     // function called by window using Notify()
     keyPressed = wnd.GetPressedKey();
-    if (keyPressed >= 1000 && keyPressed <= 1003) {     // if it's an arrow key
-        ArrowHandle(keyPressed);                        // ArrowHandle() will move the cursor
+    
+    if (keyPressed >= 1000 && keyPressed <= 1003) {     // handle arrow key
+        ArrowHandle(keyPressed);
+    } else if (keyPressed == 13) {                      // handle enter key
+        EnterHandle();
+    } else if (keyPressed == 127) {                     // handle backspace key
+        BackspaceHandle();
+    } else if (keyPressed == 9) {                       // handle tab key
+        TabHandle();
     }
 }
 
+// function used to add a line to the editor
+void Editor::AddLine(std::string line) {
+    text.push_back(line);
+    numRows += 1;
+}
+
+
+// ***************************************************************
+// Handler functions for arrows, characters, enter/backspace, etc.
+// ***************************************************************
+
 // function used to handle arrow keys for cursor movement
 void Editor::ArrowHandle(int keyPressed) {
+    
     cX = wnd.GetCursorX();  // get the x-position of the cursor 
     cY = wnd.GetCursorY();  // get the y-position of the cursor
 
@@ -76,8 +99,29 @@ void Editor::ArrowHandle(int keyPressed) {
     wnd.SetCursorY(cY);     // set the new y-position of the cursor
 }
 
-// function used to add a line to the editor
-void Editor::AddLine(std::string line) {
-    text.push_back(line);
-    numRows += 1;
+// function used to handle the Enter key
+void Editor::EnterHandle() {
+    if (cX == (int)text[cY].size()) {
+        // insert a new row at the next position
+        // shift the cursor one row down, at the beginning of the new row
+    } else {
+        // insert a new row, and split the remaining text into the new row
+         // shift the cursor one row down, at the beginning of the new row
+    }
+}
+
+// function used to handle the backspace / delete key
+void Editor::BackspaceHandle() {
+    if (cX == 0) {
+        // delete this row and merge it with the row above
+        // move the cursor up one row, to the end of the row
+    } else {
+        // delete the preceding character
+        // shift the cursor to the left by one
+    }
+}
+
+// function used to handle the tab button
+void Editor::TabHandle() {
+    // insert four spaces at the current cursor position
 }
