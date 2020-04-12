@@ -1,4 +1,4 @@
-#include "ECCommand.h"
+#include "Command.h"
 #include "ECTextDocument.h"
 #include <vector>
 

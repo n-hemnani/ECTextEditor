@@ -16,6 +16,7 @@ public:
     void EnterHandle();                 // handles Enter button
     void BackspaceHandle();             // handles backspace / delete button
     void TabHandle();                   // handles tab character
+    void CharHandle(int keyPressed);     // default key handler
     
     void AddLine(std::string line);
     

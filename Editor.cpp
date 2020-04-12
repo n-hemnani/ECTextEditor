@@ -30,7 +30,7 @@ Editor::Editor() {
 
 void Editor::Update() {     // function called by window using Notify()
     keyPressed = wnd.GetPressedKey();
-    
+
     if (keyPressed >= 1000 && keyPressed <= 1003) {     // handle arrow key
         ArrowHandle(keyPressed);
     } else if (keyPressed == 13) {                      // handle enter key
@@ -125,3 +125,8 @@ void Editor::BackspaceHandle() {
 void Editor::TabHandle() {
     // insert four spaces at the current cursor position
 }
+
+// function used to handle insertion of normal characters
+ void Editor::CharHandle(int keyPressed) {
+     ;
+ }
