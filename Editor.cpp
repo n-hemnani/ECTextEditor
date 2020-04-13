@@ -9,6 +9,7 @@ using namespace std;
 // Commands
 // ********
 
+// command to insert text
 class InsertCommand : public Command {
 public:
     InsertCommand(int cX, int cY, int keyPressed, Editor &editor): 
@@ -18,9 +19,7 @@ public:
         _editor(editor)
     {};
 	
-    ~InsertCommand() {
-        delete this;
-    }
+    ~InsertCommand() { delete this; }
     
     void Execute() {
         _editor.InsertCharAt(_cX, _cY, static_cast<char>(_key));
@@ -28,13 +27,11 @@ public:
     }
     
     void UnExecute() {
-        _editor.SetCursor(_cX - 1, _cY);
+        _editor.SetCursor(_cX, _cY);
         _editor.RemoveCharAt(_cX, _cY);
     }
 private:
-    int _cX;
-    int _cY;
-    int _key;
+    int _cX, _cY, _key;
     Editor &_editor;
 };
 
@@ -45,24 +42,15 @@ private:
 // ****************************
 
 ECTextDocumentCtrl :: ECTextDocumentCtrl(Editor &docIn) : doc(docIn) {}
-
 ECTextDocumentCtrl :: ~ECTextDocumentCtrl() {}
 
-void ECTextDocumentCtrl :: InsertTextAt(int xPos, int yPos, int ch, Editor &editor)
-{
-  InsertCommand *insert = new InsertCommand(xPos, yPos, ch, editor);
-  histCmds.ExecuteCmd(insert);
+void ECTextDocumentCtrl :: InsertTextAt(int xPos, int yPos, int ch, Editor &editor) {
+    InsertCommand *insert = new InsertCommand(xPos, yPos, ch, editor);
+    histCmds.ExecuteCmd(insert);
 }
 
-void ECTextDocumentCtrl :: Undo()
-{
-    histCmds.Undo();
-}
-
-void ECTextDocumentCtrl :: Redo()
-{
-    histCmds.Redo();
-}
+void ECTextDocumentCtrl :: Undo() { histCmds.Undo(); }
+void ECTextDocumentCtrl :: Redo() { histCmds.Redo(); }
 
 
 
@@ -81,10 +69,8 @@ Editor::Editor() : docCtrl(*this) {
     this->InsertRow("Press ctrl-q to quit");
 
     // add the lines in the observer to the window
-    for (auto line : text) {
+    for (auto line : text)
         wnd.AddRow(line);
-        numRows += 1;
-    }
 
     wnd.Attach(this);   // attach this observer to the window
     wnd.Show();         // start the editor
@@ -99,17 +85,17 @@ void Editor::Update() {     // function called by window using Notify()
         EnterHandle();
     } else if (keyPressed == 127) {                     // handle backspace key
         BackspaceHandle();
-    } else if (keyPressed == 9) {                       // handle tab key
-        TabHandle();
+    } else if (keyPressed == 26) {                      // handle undo key
+        docCtrl.Undo();
+    } else if (keyPressed == 25) {                      // handle redo key
+        docCtrl.Redo();
     } else {                                            // insert character
         CharHandle(keyPressed);
     }
     
     wnd.InitRows();
-    for (auto line : text) {
+    for (auto line : text)
         wnd.AddRow(line);
-        numRows += 1;
-    }
 }
 // function to insert a single char at position
 void Editor::InsertCharAt(int xPos, int yPos, char ch) {
@@ -118,7 +104,7 @@ void Editor::InsertCharAt(int xPos, int yPos, char ch) {
 
 // function erase a single char at position
 void Editor::RemoveCharAt(int xPos, int yPos) {
-    text[yPos].erase(xPos);;
+    text[yPos].erase(xPos, 1);;
 }
 
 // function used to add a line to the editor
@@ -130,6 +116,8 @@ void Editor::InsertRow(std::string line) {
 void Editor::SetCursor(int x, int y) {
     cX = x;
     cY = y;
+    wnd.SetCursorX(cX);
+    wnd.SetCursorY(cY);
 }
 
 
@@ -204,11 +192,6 @@ void Editor::BackspaceHandle() {
         // delete the preceding character
         // shift the cursor to the left by one
     }
-}
-
-// function used to handle the tab button
-void Editor::TabHandle() {
-    // insert four spaces at the current cursor position
 }
 
 // function used to handle insertion of normal characters

@@ -11,17 +11,23 @@ CommandHistory :: CommandHistory() {}
 CommandHistory :: ~CommandHistory() {}
 
 bool CommandHistory :: Undo() {
-    undoVec.back()->UnExecute();
-    redoVec.push_back(undoVec.back());
-    undoVec.pop_back();
-    return true;
+    if (!undoVec.empty()) {
+        undoVec.back()->UnExecute();
+        redoVec.push_back(undoVec.back());
+        undoVec.pop_back();
+        return true;
+    }
+    return false;
 }
 
 bool CommandHistory :: Redo() {
-    redoVec.back()->Execute();
-    undoVec.push_back(redoVec.back());
-    redoVec.pop_back();
-    return true;
+    if (!redoVec.empty()) {
+        redoVec.back()->Execute();
+        undoVec.push_back(redoVec.back());
+        redoVec.pop_back();
+        return true;
+    }
+    return false;
 }
 
 void CommandHistory :: ExecuteCmd( Command *pCmd ) {

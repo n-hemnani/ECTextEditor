@@ -16,8 +16,8 @@ public:
     virtual ~ECTextDocumentCtrl();
     void InsertTextAt(int xPos, int yPos, int ch, Editor &editor);
     void RemoveTextAt(int pos, int lenToRemove);
-    void Undo();    // ctrl_z 26
-    void Redo();    // ctrl_y 25
+    void Undo();
+    void Redo();
     
 private:
     Editor &doc;
@@ -35,7 +35,6 @@ public:
     void ArrowHandle(int keyPressed);   // handles arrow key / cursor movement
     void EnterHandle();                 // handles Enter button
     void BackspaceHandle();             // handles backspace / delete button
-    void TabHandle();                   // handles tab character
     void CharHandle(int keyPressed);    // default key handler
 
     void InsertCharAt(int xPos, int yPos, char ch);     // insert a single char at position
