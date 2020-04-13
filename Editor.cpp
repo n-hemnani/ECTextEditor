@@ -104,6 +104,12 @@ void Editor::Update() {     // function called by window using Notify()
     } else {                                            // insert character
         CharHandle(keyPressed);
     }
+    
+    wnd.InitRows();
+    for (auto line : text) {
+        wnd.AddRow(line);
+        numRows += 1;
+    }
 }
 // function to insert a single char at position
 void Editor::InsertCharAt(int xPos, int yPos, char ch) {
