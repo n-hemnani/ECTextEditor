@@ -11,14 +11,14 @@ using namespace std;
 // ****************************************************
 
  // constructor to initialize the window and the observer
-Editor::Editor() {
+Editor::Editor() : docCtrl(*this) {
     numRows = 0;
     wnd.AddStatusRow("", "", false);    // status row to temporarily fix bug of first row not showing
     
     // add three lines of example text using AddLine function
-    this->AddLine("CSE 3150");
-    this->AddLine("This is a very simple demo of the ECTextViewImp functionalities.");
-    this->AddLine("Press ctrl-q to quit");
+    this->InsertRow("CSE 3150");
+    this->InsertRow("This is a very simple demo of the ECTextViewImp functionalities.");
+    this->InsertRow("Press ctrl-q to quit");
 
     // add the lines in the observer to the window
     for (auto line : text) {
@@ -41,13 +41,29 @@ void Editor::Update() {     // function called by window using Notify()
         BackspaceHandle();
     } else if (keyPressed == 9) {                       // handle tab key
         TabHandle();
+    } else {                                            // insert character
+        CharHandle(keyPressed);
     }
+}
+// function to insert a single char at position
+void Editor::InsertCharAt(int xPos, int yPos, char ch) {
+    text[yPos].insert(xPos, 1, ch);
+}
+
+// function erase a single char at position
+void Editor::RemoveCharAt(int xPos, int yPos) {
+    text[yPos].erase(xPos);;
 }
 
 // function used to add a line to the editor
-void Editor::AddLine(std::string line) {
+void Editor::InsertRow(std::string line) {
     text.push_back(line);
     numRows += 1;
+}
+
+void Editor::SetCursor(int x, int y) {
+    cX = x;
+    cY = y;
 }
 
 
@@ -129,6 +145,6 @@ void Editor::TabHandle() {
 }
 
 // function used to handle insertion of normal characters
- void Editor::CharHandle(int keyPressed) {
-     ;
- }
+void Editor::CharHandle(int keyPressed) {
+    docCtrl.InsertTextAt(cX, cY, keyPressed, *this);
+}

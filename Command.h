@@ -1,23 +1,23 @@
 //
-//  ECCommand.h
+//  Command.h
 //  
 //
 //  Created by Yufeng Wu on 2/26/20.
 //
 //
 
-#ifndef ECCommand_h
-#define ECCommand_h
+#ifndef Command_h
+#define Command_h
 
 #include <vector>
 
 // ******************************************************
 // Implement command design pattern
 
-class ECCommand
+class Command
 {
 public:
-    virtual ~ECCommand() {}
+    virtual ~Command() {}
     virtual void Execute() = 0;
     virtual void UnExecute() = 0;
 };
@@ -25,20 +25,20 @@ public:
 // ******************************************************
 // Implement command history
 
-class ECCommandHistory
+class CommandHistory
 {
 public:
-    ECCommandHistory();
-    virtual ~ECCommandHistory();
+    CommandHistory();
+    virtual ~CommandHistory();
     bool Undo();
     bool Redo();
-    void ExecuteCmd( ECCommand *pCmd );
+    void ExecuteCmd( Command *pCmd );
     
 private:
     // your code goes here
-    std::vector<ECCommand*> undoVec;
-    std::vector<ECCommand*> redoVec;
+    std::vector<Command*> undoVec;
+    std::vector<Command*> redoVec;
 };
 
 
-#endif /* ECCommand_h */
+#endif /* Command_h */

@@ -1,11 +1,10 @@
 // HEADER FILE FOR OBSERVER
 
-#include "ECTextViewImp.h"
+#ifndef Editor_h
+#define Editor_h
 
-/* KEY ENUMERATION FOR REFERENCE
-    CTRL_Y = 25,
-    CTRL_Z = 26,
-  KEY ENUMERATION FOR REFERENCE */
+#include "ECTextViewImp.h"
+#include "ECTextDocument.h"
 
 // main observer of ECTextViewImp
 class Editor : public ECObserver {
@@ -14,19 +13,26 @@ public:
     ~Editor() {}
 
     void Update();                      // runs at every keystroke
+    
     void ArrowHandle(int keyPressed);   // handles arrow key / cursor movement
     void EnterHandle();                 // handles Enter button
     void BackspaceHandle();             // handles backspace / delete button
     void TabHandle();                   // handles tab character
-    void CharHandle(int keyPressed);     // default key handler
-    
-    void AddLine(std::string line);
+    void CharHandle(int keyPressed);    // default key handler
+
+    void InsertCharAt(int xPos, int yPos, char ch);     // insert a single char at position
+    void RemoveCharAt(int xPos, int yPos);              // erase a single char at position
+    void SetCursor(int x, int y);                       // changes cursor position to x, y. for undo/redo commands
+    void InsertRow(std::string line);                   // insert a row
     
 private:
-    ECTextViewImp wnd;              // window/subject
-    std::vector<std::string> text;  // vector to hold all the lines of text
-    int numRows;                    // number of lines of text in the editor
-    int cX;                         // x-position of cursor
-    int cY;                         // y-position of cursor
-    int keyPressed;                 // alue of the key pressed, obtained from the window
+    ECTextViewImp wnd;                  // window/subject
+    ECTextDocumentCtrl docCtrl;        // document controller
+    std::vector<std::string> text;      // vector to hold all the lines of text
+    int numRows;                        // number of lines of text in the editor
+    int cX;                             // x-position of cursor
+    int cY;                             // y-position of cursor
+    int keyPressed;                     // alue of the key pressed, obtained from the window
 };
+
+#endif

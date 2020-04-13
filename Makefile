@@ -1,6 +1,8 @@
 CPPFILES = main.cpp\
  ECTextViewImp.cpp\
  Editor.cpp\
+ ECTextDocument.cpp\
+ Command.cpp
 
 HFILES = $(CPPFILES:.cpp=.h)
 
@@ -11,14 +13,14 @@ LIBPATH =
 
 CFLAGS = -O3 -std=c++11 -Wall -I.
 
-all: TextEditor
+all: ECTextEditor
 
 %.o: %.cpp
 	$(CC) -c $< -o $@ $(CFLAGS)
 
 ECTextEditor:$(OFILES)
-	$(CC) -o TextEditor $(OFILES)
+	$(CC) -o ECTextEditor $(OFILES)
 
 clean: 
 	rm *.o
-	rm TextEditor
+	rm ECTextEditor
