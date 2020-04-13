@@ -4,7 +4,25 @@
 #define Editor_h
 
 #include "ECTextViewImp.h"
-#include "ECTextDocument.h"
+//#include "ECTextDocument.h"
+#include "Command.h"
+
+class Editor;
+
+class ECTextDocumentCtrl
+{
+public:
+    ECTextDocumentCtrl(Editor &docIn);          // conroller constructor takes the document as input
+    virtual ~ECTextDocumentCtrl();
+    void InsertTextAt(int xPos, int yPos, int ch, Editor &editor);
+    void RemoveTextAt(int pos, int lenToRemove);
+    void Undo();    // ctrl_z 26
+    void Redo();    // ctrl_y 25
+    
+private:
+    Editor &doc;
+    CommandHistory histCmds;
+};
 
 // main observer of ECTextViewImp
 class Editor : public ECObserver {
