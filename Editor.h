@@ -15,7 +15,9 @@ public:
     ECTextDocumentCtrl(Editor &docIn);          // conroller constructor takes the document as input
     virtual ~ECTextDocumentCtrl();
     void InsertTextAt(int xPos, int yPos, int ch, Editor &editor);
-    void RemoveTextAt(int pos, int lenToRemove);
+    void RemoveTextAt(int xPos, int yPos, Editor &editor);
+    void InsertRowAt(int xPos, int yPos, Editor &editor);
+    void RemoveRowAt(int xPos, int yPos, Editor &editor);
     void Undo();
     void Redo();
     
@@ -37,10 +39,14 @@ public:
     void BackspaceHandle();             // handles backspace / delete button
     void CharHandle(int keyPressed);    // default key handler
 
+    void SetCursor(int x, int y);                       // changes cursor position to x, y. for undo/redo commands
     void InsertCharAt(int xPos, int yPos, char ch);     // insert a single char at position
     void RemoveCharAt(int xPos, int yPos);              // erase a single char at position
-    void SetCursor(int x, int y);                       // changes cursor position to x, y. for undo/redo commands
     void InsertRow(std::string line);                   // insert a row
+    void RemoveRowAt(int yPos);                         // remove a specific row             
+    void InsertRowAt(int yPos, std::string _row_deleted, int row_length);   // insert a specific row
+    
+    std::vector<std::string> GetText(); // return text
     
 private:
     ECTextViewImp wnd;                  // window/subject

@@ -35,6 +35,93 @@ private:
     Editor &_editor;
 };
 
+// command to remove text
+class RemoveCommand : public Command {
+public:
+    RemoveCommand(int cX, int cY, Editor &editor): 
+        _cX(cX),
+        _cY(cY),
+        _editor(editor)
+    {};
+	
+    ~RemoveCommand() { delete this; }
+    
+    void Execute() {
+        _key_deleted = _editor.GetText()[_cY][_cX - 1];
+        _editor.SetCursor(_cX - 1, _cY);
+        _editor.RemoveCharAt(_cX - 1, _cY);
+    }
+    
+    void UnExecute() {
+        _editor.InsertCharAt(_cX - 1, _cY, _key_deleted);
+        _editor.SetCursor(_cX, _cY);
+    }
+private:
+    int _cX, _cY;
+    char _key_deleted;
+    Editor &_editor;
+};
+
+// command to remove row with backspace
+class RowBackspaceCommand : public Command {
+public:
+    RowBackspaceCommand(int cX, int cY, Editor &editor): 
+        _cX(cX),
+        _cY(cY),
+        _editor(editor)
+    {};
+	
+    ~RowBackspaceCommand() { delete this; }
+    
+    void Execute() {
+        _row_deleted = _editor.GetText()[_cY];
+        _row_length = (int)_row_deleted.size();
+
+        int new_x = (int)_editor.GetText()[_cY - 1].size();
+        _editor.SetCursor(new_x, _cY - 1);
+        
+        _editor.RemoveRowAt(_cY);
+    }
+    
+    void UnExecute() {
+        _editor.InsertRowAt(_cY, _row_deleted, _row_length);
+        _editor.SetCursor(0, _cY);
+    }
+private:
+    int _cX, _cY, _row_length;
+    std::string _row_deleted;
+    Editor &_editor;
+};
+
+// command to insert row with enter
+class EnterCommand : public Command {
+public:
+    EnterCommand(int cX, int cY, Editor &editor): 
+        _cX(cX),
+        _cY(cY),
+        _editor(editor)
+    {};
+	
+    ~EnterCommand() { delete this; }
+    
+    void Execute() {
+        _row_entered = _editor.GetText()[_cY].substr(_cX, (int)_editor.GetText()[_cY].size());
+        _row_length = (int)_row_entered.size();
+
+        _editor.InsertRowAt(_cY + 1, _row_entered, _row_length);
+        _editor.SetCursor(0, _cY + 1);
+    }
+    
+    void UnExecute() {
+        _editor.RemoveRowAt(_cY + 1);
+        _editor.SetCursor(_cX, _cY);
+    }
+private:
+    int _cX, _cY, _row_length;
+    std::string _row_entered;
+    Editor &_editor;
+};
+
 
 
 // ****************************
@@ -47,6 +134,21 @@ ECTextDocumentCtrl :: ~ECTextDocumentCtrl() {}
 void ECTextDocumentCtrl :: InsertTextAt(int xPos, int yPos, int ch, Editor &editor) {
     InsertCommand *insert = new InsertCommand(xPos, yPos, ch, editor);
     histCmds.ExecuteCmd(insert);
+}
+
+void ECTextDocumentCtrl :: RemoveTextAt(int xPos, int yPos, Editor &editor) {
+    RemoveCommand *remove = new RemoveCommand(xPos, yPos, editor);
+    histCmds.ExecuteCmd(remove);
+}
+
+void ECTextDocumentCtrl :: RemoveRowAt(int xPos, int yPos, Editor &editor) {
+    RowBackspaceCommand *rowBackspace = new RowBackspaceCommand(xPos, yPos, editor);
+    histCmds.ExecuteCmd(rowBackspace);
+}
+
+void ECTextDocumentCtrl :: InsertRowAt(int xPos, int yPos, Editor &editor) {
+    EnterCommand *enter = new EnterCommand(xPos, yPos, editor);
+    histCmds.ExecuteCmd(enter);
 }
 
 void ECTextDocumentCtrl :: Undo() { histCmds.Undo(); }
@@ -64,8 +166,7 @@ Editor::Editor() : docCtrl(*this) {
     wnd.AddStatusRow("", "", false);    // status row to temporarily fix bug of first row not showing
     
     // add three lines of example text using AddLine function
-    this->InsertRow("CSE 3150");
-    this->InsertRow("This is a very simple demo of the ECTextViewImp functionalities.");
+    this->InsertRow("");
     this->InsertRow("Press ctrl-q to quit");
 
     // add the lines in the observer to the window
@@ -93,18 +194,28 @@ void Editor::Update() {     // function called by window using Notify()
         CharHandle(keyPressed);
     }
     
+    // refresh the window after changes
     wnd.InitRows();
     for (auto line : text)
         wnd.AddRow(line);
 }
+
+// set the cursor
+void Editor::SetCursor(int x, int y) {
+    cX = x;
+    cY = y;
+    wnd.SetCursorX(cX);
+    wnd.SetCursorY(cY);
+}
+
 // function to insert a single char at position
 void Editor::InsertCharAt(int xPos, int yPos, char ch) {
-    text[yPos].insert(xPos, 1, ch);
+    text[yPos].insert(xPos, 1, ch);     // insert ch at xPos
 }
 
 // function erase a single char at position
 void Editor::RemoveCharAt(int xPos, int yPos) {
-    text[yPos].erase(xPos, 1);;
+    text[yPos].erase(xPos, 1);          // remove char at xPos
 }
 
 // function used to add a line to the editor
@@ -113,12 +224,22 @@ void Editor::InsertRow(std::string line) {
     numRows += 1;
 }
 
-void Editor::SetCursor(int x, int y) {
-    cX = x;
-    cY = y;
-    wnd.SetCursorX(cX);
-    wnd.SetCursorY(cY);
+// function used for backspace / enter when merging two rows
+void Editor::RemoveRowAt(int yPos) {
+    //text[yPos - 1] += " ";
+    text[yPos - 1] += text[yPos];
+    text.erase(text.begin() + yPos);
+    numRows -= 1;
 }
+
+// function used for enter / backspace when unmerging two lines
+void Editor::InsertRowAt(int yPos, std::string _row_deleted, int row_length) {
+    text[yPos - 1] = text[yPos - 1].substr(0, (int)text[yPos - 1].size() - row_length);
+    text.insert(text.begin() + yPos, _row_deleted);
+    numRows += 1;
+}
+
+std::vector<std::string> Editor::GetText() { return text; }
 
 
 
@@ -176,21 +297,20 @@ void Editor::ArrowHandle(int keyPressed) {
 void Editor::EnterHandle() {
     if (cX == (int)text[cY].size()) {
         // insert a new row at the next position
-        // shift the cursor one row down, at the beginning of the new row
     } else {
         // insert a new row, and split the remaining text into the new row
-         // shift the cursor one row down, at the beginning of the new row
+        docCtrl.InsertRowAt(cX, cY, *this);
     }
 }
 
 // function used to handle the backspace / delete key
 void Editor::BackspaceHandle() {
     if (cX == 0) {
-        // delete this row and merge it with the row above
-        // move the cursor up one row, to the end of the row
+        // delete this row and merge it with the one above
+        docCtrl.RemoveRowAt(cX, cY, *this);
     } else {
-        // delete the preceding character
-        // shift the cursor to the left by one
+        // delete a character
+        docCtrl.RemoveTextAt(cX, cY, *this);
     }
 }
 
