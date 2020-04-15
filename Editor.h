@@ -1,10 +1,9 @@
-// HEADER FILE FOR OBSERVER
+// HEADER FILE FOR OBSERVER AND CONTROLLER
 
 #ifndef Editor_h
 #define Editor_h
 
 #include "ECTextViewImp.h"
-//#include "ECTextDocument.h"
 #include "Command.h"
 
 class Editor;
@@ -42,7 +41,7 @@ public:
     void SetCursor(int x, int y);                       // changes cursor position to x, y. for undo/redo commands
     void InsertCharAt(int xPos, int yPos, char ch);     // insert a single char at position
     void RemoveCharAt(int xPos, int yPos);              // erase a single char at position
-    void InsertRow(std::string line);                   // insert a row
+    void InsertRow(std::string line, int yPos);         // insert a row
     void RemoveRowAt(int yPos);                         // remove a specific row             
     void InsertRowAt(int yPos, std::string _row_deleted, int row_length);   // insert a specific row
     

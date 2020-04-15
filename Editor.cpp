@@ -1,13 +1,13 @@
-// IMPLEMENTATION FOR OBSERVER
+// IMPLEMENTATION FOR OBSERVER AND CONTROLLER
 
 #include "Editor.h"
 #include <iostream>
 
 using namespace std;
 
-// ********
+// ****************************************************************
 // Commands
-// ********
+// ****************************************************************
 
 // command to insert text
 class InsertCommand : public Command {
@@ -77,8 +77,8 @@ public:
         _row_deleted = _editor.GetText()[_cY];
         _row_length = (int)_row_deleted.size();
 
-        int new_x = (int)_editor.GetText()[_cY - 1].size();
-        _editor.SetCursor(new_x, _cY - 1);
+        _cX = (int)_editor.GetText()[_cY - 1].size();
+        _editor.SetCursor(_cX, _cY - 1);
         
         _editor.RemoveRowAt(_cY);
     }
@@ -105,9 +105,16 @@ public:
     ~EnterCommand() { delete this; }
     
     void Execute() {
-        _row_entered = _editor.GetText()[_cY].substr(_cX, (int)_editor.GetText()[_cY].size());
-        _row_length = (int)_row_entered.size();
-
+        if (_cX == (int)_editor.GetText()[_cY].size()) {
+            //_editor.InsertRow("", _cY + 1);
+            _row_entered = "";
+            _row_length = 0;
+        } else {
+            _row_entered = _editor.GetText()[_cY].substr(_cX, (int)_editor.GetText()[_cY].size());
+            _row_length = (int)_row_entered.size();
+            //_editor.InsertRowAt(_cY + 1, _row_entered, _row_length);
+            //_editor.SetCursor(0, _cY + 1);
+        }
         _editor.InsertRowAt(_cY + 1, _row_entered, _row_length);
         _editor.SetCursor(0, _cY + 1);
     }
@@ -124,9 +131,11 @@ private:
 
 
 
-// ****************************
+
+
+// **************************************************************************************
 // Controller for text document
-// ****************************
+// **************************************************************************************
 
 ECTextDocumentCtrl :: ECTextDocumentCtrl(Editor &docIn) : doc(docIn) {}
 ECTextDocumentCtrl :: ~ECTextDocumentCtrl() {}
@@ -156,18 +165,20 @@ void ECTextDocumentCtrl :: Redo() { histCmds.Redo(); }
 
 
 
-// ********************************
+
+
+// **************************************************************************************
 // Implementation of observer class
-// ********************************
+// **************************************************************************************
 
  // constructor to initialize the window and the observer
 Editor::Editor() : docCtrl(*this) {
     numRows = 0;
     wnd.AddStatusRow("", "", false);    // status row to temporarily fix bug of first row not showing
     
-    // add three lines of example text using AddLine function
-    this->InsertRow("");
-    this->InsertRow("Press ctrl-q to quit");
+    // add two lines of text using InsertRow function
+    this->InsertRow("", 0);
+    this->InsertRow("Press ctrl-q to quit", 1);
 
     // add the lines in the observer to the window
     for (auto line : text)
@@ -177,15 +188,17 @@ Editor::Editor() : docCtrl(*this) {
     wnd.Show();         // start the editor
 }
 
-void Editor::Update() {     // function called by window using Notify()
-    keyPressed = wnd.GetPressedKey();
+// function called by window using Notify()
+void Editor::Update() {
+    keyPressed = wnd.GetPressedKey();   // obtain the key
 
     if (keyPressed >= 1000 && keyPressed <= 1003) {     // handle arrow key
         ArrowHandle(keyPressed);
     } else if (keyPressed == 13) {                      // handle enter key
         EnterHandle();
     } else if (keyPressed == 127) {                     // handle backspace key
-        BackspaceHandle();
+        if (cY > 0 || cX > 0)
+            BackspaceHandle();
     } else if (keyPressed == 26) {                      // handle undo key
         docCtrl.Undo();
     } else if (keyPressed == 25) {                      // handle redo key
@@ -194,7 +207,7 @@ void Editor::Update() {     // function called by window using Notify()
         CharHandle(keyPressed);
     }
     
-    // refresh the window after changes
+    // refresh the window after changes have been made
     wnd.InitRows();
     for (auto line : text)
         wnd.AddRow(line);
@@ -208,25 +221,24 @@ void Editor::SetCursor(int x, int y) {
     wnd.SetCursorY(cY);
 }
 
-// function to insert a single char at position
+// function to insert a single char at given position
 void Editor::InsertCharAt(int xPos, int yPos, char ch) {
     text[yPos].insert(xPos, 1, ch);     // insert ch at xPos
 }
 
-// function erase a single char at position
+// function erase a single char at given position
 void Editor::RemoveCharAt(int xPos, int yPos) {
     text[yPos].erase(xPos, 1);          // remove char at xPos
 }
 
 // function used to add a line to the editor
-void Editor::InsertRow(std::string line) {
-    text.push_back(line);
+void Editor::InsertRow(std::string line, int yPos) {
+    text.insert(text.begin() + yPos, line);
     numRows += 1;
 }
 
 // function used for backspace / enter when merging two rows
 void Editor::RemoveRowAt(int yPos) {
-    //text[yPos - 1] += " ";
     text[yPos - 1] += text[yPos];
     text.erase(text.begin() + yPos);
     numRows -= 1;
@@ -240,6 +252,8 @@ void Editor::InsertRowAt(int yPos, std::string _row_deleted, int row_length) {
 }
 
 std::vector<std::string> Editor::GetText() { return text; }
+
+
 
 
 
@@ -295,12 +309,8 @@ void Editor::ArrowHandle(int keyPressed) {
 
 // function used to handle the Enter key
 void Editor::EnterHandle() {
-    if (cX == (int)text[cY].size()) {
-        // insert a new row at the next position
-    } else {
-        // insert a new row, and split the remaining text into the new row
-        docCtrl.InsertRowAt(cX, cY, *this);
-    }
+    // insert a new row, and split the remaining text into the new row
+    docCtrl.InsertRowAt(cX, cY, *this);
 }
 
 // function used to handle the backspace / delete key
