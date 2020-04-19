@@ -10,6 +10,9 @@
 #define Command_h
 
 #include <vector>
+#include <string>
+
+class Editor;
 
 // ******************************************************
 // Implement command design pattern
@@ -20,6 +23,56 @@ public:
     virtual ~Command() {}
     virtual void Execute() = 0;
     virtual void UnExecute() = 0;
+};
+
+// ******************************************************
+// Implement commands
+
+class InsertCommand : public Command {
+public:
+    InsertCommand(int cX, int cY, int keyPressed, Editor &editor);
+    ~InsertCommand();
+    void Execute();
+    void UnExecute();
+private:
+    int _cX, _cY, _key;
+    Editor &_editor;
+};
+
+class RemoveCommand : public Command {
+public:
+    RemoveCommand(int cX, int cY, Editor &editor);
+    ~RemoveCommand();
+    void Execute();
+    void UnExecute();
+private:
+    int _cX, _cY;
+    char _key_deleted;
+    Editor &_editor;
+};
+
+class RowBackspaceCommand : public Command {
+public:
+    RowBackspaceCommand(int cX, int cY, Editor &editor);
+    ~RowBackspaceCommand();
+    void Execute();
+    void UnExecute();
+private:
+    int _cX, _cY, _row_length;
+    std::string _row_deleted;
+    Editor &_editor;
+};
+
+class EnterCommand : public Command {
+public:
+    EnterCommand(int cX, int cY, Editor &editor);
+    ~EnterCommand();
+    void Execute();
+    void UnExecute();
+private:
+    int _cX, _cY, _row_length;
+    std::string _row_entered;
+    Editor &_editor;
 };
 
 // ******************************************************

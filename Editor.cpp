@@ -5,134 +5,6 @@
 
 using namespace std;
 
-// ****************************************************************
-// Commands
-// ****************************************************************
-
-// command to insert text
-class InsertCommand : public Command {
-public:
-    InsertCommand(int cX, int cY, int keyPressed, Editor &editor): 
-        _cX(cX),
-        _cY(cY),
-        _key(keyPressed),
-        _editor(editor)
-    {};
-	
-    ~InsertCommand() { delete this; }
-    
-    void Execute() {
-        _editor.InsertCharAt(_cX, _cY, static_cast<char>(_key));
-        _editor.SetCursor(_cX + 1, _cY);
-    }
-    
-    void UnExecute() {
-        _editor.SetCursor(_cX, _cY);
-        _editor.RemoveCharAt(_cX, _cY);
-    }
-private:
-    int _cX, _cY, _key;
-    Editor &_editor;
-};
-
-// command to remove text
-class RemoveCommand : public Command {
-public:
-    RemoveCommand(int cX, int cY, Editor &editor): 
-        _cX(cX),
-        _cY(cY),
-        _editor(editor)
-    {};
-	
-    ~RemoveCommand() { delete this; }
-    
-    void Execute() {
-        _key_deleted = _editor.GetText()[_cY][_cX - 1];
-        _editor.SetCursor(_cX - 1, _cY);
-        _editor.RemoveCharAt(_cX - 1, _cY);
-    }
-    
-    void UnExecute() {
-        _editor.InsertCharAt(_cX - 1, _cY, _key_deleted);
-        _editor.SetCursor(_cX, _cY);
-    }
-private:
-    int _cX, _cY;
-    char _key_deleted;
-    Editor &_editor;
-};
-
-// command to remove row with backspace
-class RowBackspaceCommand : public Command {
-public:
-    RowBackspaceCommand(int cX, int cY, Editor &editor): 
-        _cX(cX),
-        _cY(cY),
-        _editor(editor)
-    {};
-	
-    ~RowBackspaceCommand() { delete this; }
-    
-    void Execute() {
-        _row_deleted = _editor.GetText()[_cY];
-        _row_length = (int)_row_deleted.size();
-
-        _cX = (int)_editor.GetText()[_cY - 1].size();
-        _editor.SetCursor(_cX, _cY - 1);
-        
-        _editor.RemoveRowAt(_cY);
-    }
-    
-    void UnExecute() {
-        _editor.InsertRowAt(_cY, _row_deleted, _row_length);
-        _editor.SetCursor(0, _cY);
-    }
-private:
-    int _cX, _cY, _row_length;
-    std::string _row_deleted;
-    Editor &_editor;
-};
-
-// command to insert row with enter
-class EnterCommand : public Command {
-public:
-    EnterCommand(int cX, int cY, Editor &editor): 
-        _cX(cX),
-        _cY(cY),
-        _editor(editor)
-    {};
-	
-    ~EnterCommand() { delete this; }
-    
-    void Execute() {
-        if (_cX == (int)_editor.GetText()[_cY].size()) {
-            //_editor.InsertRow("", _cY + 1);
-            _row_entered = "";
-            _row_length = 0;
-        } else {
-            _row_entered = _editor.GetText()[_cY].substr(_cX, (int)_editor.GetText()[_cY].size());
-            _row_length = (int)_row_entered.size();
-            //_editor.InsertRowAt(_cY + 1, _row_entered, _row_length);
-            //_editor.SetCursor(0, _cY + 1);
-        }
-        _editor.InsertRowAt(_cY + 1, _row_entered, _row_length);
-        _editor.SetCursor(0, _cY + 1);
-    }
-    
-    void UnExecute() {
-        _editor.RemoveRowAt(_cY + 1);
-        _editor.SetCursor(_cX, _cY);
-    }
-private:
-    int _cX, _cY, _row_length;
-    std::string _row_entered;
-    Editor &_editor;
-};
-
-
-
-
-
 // **************************************************************************************
 // Controller for text document
 // **************************************************************************************
@@ -166,7 +38,6 @@ void ECTextDocumentCtrl :: Redo() { histCmds.Redo(); }
 
 
 
-
 // **************************************************************************************
 // Implementation of observer class
 // **************************************************************************************
@@ -192,17 +63,18 @@ Editor::Editor() : docCtrl(*this) {
 void Editor::Update() {
     keyPressed = wnd.GetPressedKey();   // obtain the key
 
-    if (keyPressed >= 1000 && keyPressed <= 1003) {     // handle arrow key
+    if (keyPressed >= 1000 && keyPressed <= 1003) {     // arrow
         ArrowHandle(keyPressed);
-    } else if (keyPressed == 13) {                      // handle enter key
+    } else if (keyPressed == 13) {                      // enter
         EnterHandle();
-    } else if (keyPressed == 127) {                     // handle backspace key
-        if (cY > 0 || cX > 0)
-            BackspaceHandle();
-    } else if (keyPressed == 26) {                      // handle undo key
+    } else if (keyPressed == 127) {                     // backspace
+        BackspaceHandle();
+    } else if (keyPressed == 26) {                      // undo / ctrl z
         docCtrl.Undo();
-    } else if (keyPressed == 25) {                      // handle redo key
+    } else if (keyPressed == 25) {                      // redo / ctrl y
         docCtrl.Redo();
+    } else if (keyPressed == 19) {                      // save / ctrl s
+        // save
     } else {                                            // insert character
         CharHandle(keyPressed);
     }
@@ -315,12 +187,14 @@ void Editor::EnterHandle() {
 
 // function used to handle the backspace / delete key
 void Editor::BackspaceHandle() {
-    if (cX == 0) {
-        // delete this row and merge it with the one above
-        docCtrl.RemoveRowAt(cX, cY, *this);
-    } else {
-        // delete a character
-        docCtrl.RemoveTextAt(cX, cY, *this);
+    if (cY > 0 || cX > 0) {
+        if (cX == 0) {
+            // delete this row and merge it with the one above
+            docCtrl.RemoveRowAt(cX, cY, *this);
+        } else {
+            // delete a character
+            docCtrl.RemoveTextAt(cX, cY, *this);
+        }
     }
 }
 

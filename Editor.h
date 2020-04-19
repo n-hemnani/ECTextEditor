@@ -49,7 +49,7 @@ public:
     
 private:
     ECTextViewImp wnd;                  // window/subject
-    ECTextDocumentCtrl docCtrl;        // document controller
+    ECTextDocumentCtrl docCtrl;         // document controller
     std::vector<std::string> text;      // vector to hold all the lines of text
     int numRows;                        // number of lines of text in the editor
     int cX;                             // x-position of cursor
