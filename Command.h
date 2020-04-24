@@ -12,7 +12,7 @@
 #include <vector>
 #include <string>
 
-class Editor;
+class Editor;   // forward declaration because Editor is in every command
 
 // ******************************************************
 // Implement command design pattern
@@ -92,6 +92,5 @@ private:
     std::vector<Command*> undoVec;
     std::vector<Command*> redoVec;
 };
-
 
 #endif /* Command_h */
