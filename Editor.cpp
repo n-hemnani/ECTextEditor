@@ -47,26 +47,26 @@ Editor::Editor(string name) /*: docCtrl(*this)*/ {
     numRows = 0;                        // there are 0 rows at the beginning
     wnd.AddStatusRow("", "", false);    // status row to temporarily fix bug of first row not showing
     
-    ifstream infile(name.c_str());
-    if (infile.good()) {
+    ifstream infile(name.c_str());      // try opening the file
+    if (infile.good()) {                // if the file exists, read it into the editor
         string temp;
-        while (getline(infile, temp)) {
-            this->InsertRow(temp);
+        while (getline(infile, temp)) { // read the file line by line
+            this->InsertRow(temp);      // and add each line to editor
         }
-        infile.close();
-        this->InsertRow("");
-        this->SetCursor(0, numRows - 1);
+        infile.close();                     // close the file
+        this->InsertRow("");                // add a new line at the bottom
+        this->SetCursor(0, numRows - 1);    // set the cursor
     } else {
-        std::ofstream file { nameoffile };
-        this->InsertRow("");
-        this->SetCursor(0, 0);
+        std::ofstream file { nameoffile };  // else, create the new file and
+        this->InsertRow("");                // initialize it to empty text
+        this->SetCursor(0, 0);              // set the cursor
     }
 
-    // add the lines in the observer to the window
+    // add the lines in the editor to the window
     for (auto line : text)
         wnd.AddRow(line);
     
-    wnd.Attach(this);   // attach this observer to the window
+    wnd.Attach(this);   // attach this editor to the window
     wnd.Show();         // start the editor
 }
 
@@ -85,7 +85,12 @@ void Editor::Update() {
     } else if (keyPressed == 25) {                      // redo / ctrl y
         docCtrl.Redo();
     } else if (keyPressed == 19) {                      // save / ctrl s
-        // save
+        SaveHandle();
+    } else if (keyPressed == 17) {                      // quit / ctrl q
+        SaveHandle();
+        wnd.Quit();
+        for(int i = 0; i < 50; i++)
+	        cout << endl;
     } else {                                            // insert character
         CharHandle(keyPressed);
     }
@@ -207,6 +212,18 @@ void Editor::BackspaceHandle() {
             docCtrl.RemoveTextAt(cX, cY, *this);
         }
     }
+}
+
+void Editor::SaveHandle() {
+    fstream outfile;
+    outfile.open(nameoffile);
+    if (outfile.is_open()) {
+        for (auto line : text) {
+            outfile << line;
+            outfile << "\n";
+        }
+    }
+    outfile.close();
 }
 
 // function used to handle insertion of normal characters

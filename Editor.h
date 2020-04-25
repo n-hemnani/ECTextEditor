@@ -40,6 +40,7 @@ public:
     void ArrowHandle(int keyPressed);   // handles arrow key / cursor movement
     void EnterHandle();                 // handles Enter button
     void BackspaceHandle();             // handles backspace / delete button
+    void SaveHandle();                  // handles save key
     void CharHandle(int keyPressed);    // default key handler
 
     void SetCursor(int x, int y);                       // changes cursor position to x, y. for undo/redo commands

@@ -205,6 +205,7 @@ void ECTextViewImp :: Show()
         keyLastPressed = ReadKey(STDIN_FILENO);
         
         // just priint for now
+        /*
         if( keyLastPressed == CTRL_Q)
         {
             Quit();
@@ -212,6 +213,7 @@ void ECTextViewImp :: Show()
 	            cout << endl;
             break;
         }
+        */
         
         // notify
         Notify();
