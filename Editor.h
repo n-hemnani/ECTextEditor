@@ -5,13 +5,17 @@
 
 #include "ECTextViewImp.h"
 #include "Command.h"
+#include <fstream>
+#include <iostream>
 
-class Editor;
+using namespace std;
+
+class Editor;   // forward declaration because Editor is in ECTextDocumentCtrl
 
 class ECTextDocumentCtrl
 {
 public:
-    ECTextDocumentCtrl(Editor &docIn);          // conroller constructor takes the document as input
+    ECTextDocumentCtrl(/*Editor &docIn*/);          // conroller constructor takes the document as input
     virtual ~ECTextDocumentCtrl();
     void InsertTextAt(int xPos, int yPos, int ch, Editor &editor);
     void RemoveTextAt(int xPos, int yPos, Editor &editor);
@@ -21,14 +25,14 @@ public:
     void Redo();
     
 private:
-    Editor &doc;
+    //Editor &doc;
     CommandHistory histCmds;
 };
 
 // main observer of ECTextViewImp
 class Editor : public ECObserver {
 public:
-    Editor();
+    Editor(string name);
     ~Editor() {}
 
     void Update();                      // runs at every keystroke
@@ -41,7 +45,7 @@ public:
     void SetCursor(int x, int y);                       // changes cursor position to x, y. for undo/redo commands
     void InsertCharAt(int xPos, int yPos, char ch);     // insert a single char at position
     void RemoveCharAt(int xPos, int yPos);              // erase a single char at position
-    void InsertRow(std::string line, int yPos);         // insert a row
+    void InsertRow(std::string line);                   // insert a row
     void RemoveRowAt(int yPos);                         // remove a specific row             
     void InsertRowAt(int yPos, std::string _row_deleted, int row_length);   // insert a specific row
     
@@ -51,10 +55,11 @@ private:
     ECTextViewImp wnd;                  // window/subject
     ECTextDocumentCtrl docCtrl;         // document controller
     std::vector<std::string> text;      // vector to hold all the lines of text
-    int numRows;                        // number of lines of text in the editor
+    int numRows;                        // number of lines in text
     int cX;                             // x-position of cursor
     int cY;                             // y-position of cursor
-    int keyPressed;                     // alue of the key pressed, obtained from the window
+    int keyPressed;                     // value of the key pressed, obtained from the window
+    string nameoffile;                  // filename to read/write to
 };
 
 #endif

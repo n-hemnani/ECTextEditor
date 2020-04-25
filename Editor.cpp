@@ -1,7 +1,6 @@
 // IMPLEMENTATION FOR OBSERVER AND CONTROLLER
 
 #include "Editor.h"
-#include <iostream>
 
 using namespace std;
 
@@ -9,7 +8,7 @@ using namespace std;
 // Controller for text document
 // **************************************************************************************
 
-ECTextDocumentCtrl :: ECTextDocumentCtrl(Editor &docIn) : doc(docIn) {}
+ECTextDocumentCtrl :: ECTextDocumentCtrl(/*Editor &docIn*/) /*: doc(docIn)*/ {}
 ECTextDocumentCtrl :: ~ECTextDocumentCtrl() {}
 
 void ECTextDocumentCtrl :: InsertTextAt(int xPos, int yPos, int ch, Editor &editor) {
@@ -43,18 +42,30 @@ void ECTextDocumentCtrl :: Redo() { histCmds.Redo(); }
 // **************************************************************************************
 
  // constructor to initialize the window and the observer
-Editor::Editor() : docCtrl(*this) {
-    numRows = 0;
+Editor::Editor(string name) /*: docCtrl(*this)*/ {
+    nameoffile = name;                  // initialize the filename that is passed in
+    numRows = 0;                        // there are 0 rows at the beginning
     wnd.AddStatusRow("", "", false);    // status row to temporarily fix bug of first row not showing
     
-    // add two lines of text using InsertRow function
-    this->InsertRow("", 0);
-    this->InsertRow("Press ctrl-q to quit", 1);
+    ifstream infile(name.c_str());
+    if (infile.good()) {
+        string temp;
+        while (getline(infile, temp)) {
+            this->InsertRow(temp);
+        }
+        infile.close();
+        this->InsertRow("");
+        this->SetCursor(0, numRows - 1);
+    } else {
+        std::ofstream file { nameoffile };
+        this->InsertRow("");
+        this->SetCursor(0, 0);
+    }
 
     // add the lines in the observer to the window
     for (auto line : text)
         wnd.AddRow(line);
-
+    
     wnd.Attach(this);   // attach this observer to the window
     wnd.Show();         // start the editor
 }
@@ -104,8 +115,8 @@ void Editor::RemoveCharAt(int xPos, int yPos) {
 }
 
 // function used to add a line to the editor
-void Editor::InsertRow(std::string line, int yPos) {
-    text.insert(text.begin() + yPos, line);
+void Editor::InsertRow(std::string line) {
+    text.insert(text.begin() + numRows, line);
     numRows += 1;
 }
 
