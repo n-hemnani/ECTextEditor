@@ -1,7 +1,8 @@
 CPPFILES = main.cpp\
  ECTextViewImp.cpp\
  Editor.cpp\
- Command.cpp
+ Command.cpp\
+ Visible.cpp
 
 HFILES = $(CPPFILES:.cpp=.h)
 

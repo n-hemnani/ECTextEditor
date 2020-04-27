@@ -5,12 +5,14 @@
 
 #include "ECTextViewImp.h"
 #include "Command.h"
+#include "Visible.h"
 #include <fstream>
 #include <iostream>
 
 using namespace std;
 
-class Editor;   // forward declaration because Editor is in ECTextDocumentCtrl
+//class Editor;   // forward declaration because Editor is in ECTextDocumentCtrl
+class Visible;
 
 class ECTextDocumentCtrl
 {
@@ -55,11 +57,14 @@ public:
 private:
     ECTextViewImp wnd;                  // window/subject
     ECTextDocumentCtrl docCtrl;         // document controller
-    std::vector<std::string> text;      // vector to hold all the lines of text
+    vector<string> text;                // vector to hold all the lines of text
     int numRows;                        // number of lines in text
     int cX;                             // x-position of cursor
     int cY;                             // y-position of cursor
     int keyPressed;                     // value of the key pressed, obtained from the window
+    int wndRows = wnd.GetRowNumInView();
+    int wndCols = wnd.GetColNumInView();
+    Visible vis = Visible(wndRows, wndCols, text, wnd);
     string nameoffile;                  // filename to read/write to
 };
 
