@@ -1,58 +1,51 @@
 #include "Visible.h"
 
-using namespace std;
-
-Visible::Visible(int rows, int cols, vector<string> text, ECTextViewImp &wnd) :
+Visible::Visible(int rows, int cols, std::vector<std::string> text, ECTextViewImp &wnd) :
     height(rows),
     width(cols),
     paragraphs(text),
-    wnd(wnd) {}
+    _wnd(wnd) {}
 
-void Visible::Compose(vector<string> text) {
+void Visible::Compose(std::vector<std::string> text) {
     paragraphs = text;
-    vector<string> wrappedText;
+    std::vector<std::string> wrappedText;
     for (auto paragraph : paragraphs) {
-        if (paragraph.size() <= width) {
+        if (paragraph.length() <= width) {
             wrappedText.push_back(paragraph);
         } else {
-            vector<string> wrappedParagraph = this->ComposeParagraph(paragraph);
+            std::vector<std::string> wrappedParagraph = this->ComposeParagraph(paragraph);
             for (auto line : wrappedParagraph)
                 wrappedText.push_back(line);
         }
     }
-    
-    wnd.InitRows();
+
+    _wnd.InitRows();
     for (auto line : wrappedText)
-        wnd.AddRow(line);
+        _wnd.AddRow(line);
 }
 
-vector<string> Visible::ComposeParagraph(string paragraph) {
-    vector<string> splitWords = this->SplitWords(paragraph);
-    vector<string> composed;
+std::vector<std::string> Visible::ComposeParagraph(std::string paragraph) {
+    std::vector<std::string> splitWords = this->SplitWords(paragraph);
+    std::vector<std::string> composed;
     composed.push_back("");
     int currLength = 0;
     int currLine = 0;
 
     for (int i = 0; i < splitWords.size(); i++) {
-        string word = splitWords[i];
-        if (currLength + word.size() <= width) {
-            composed[currLine] += word;
-            currLength += (int)word.size();
-        } else {
-            if (currLength > 0) {
-                composed.push_back("");
-                currLength = 0;
-                currLine++;
-            }
-
-            // more code to split word if it's too long for a line
-
+        std::string word = splitWords[i];
+        if (currLength + word.length() > width) {
+            composed.push_back("");
+            currLength = 0;
+            currLine += 1;
         }
+        composed[currLine] += word;
+        currLength += word.size();
     }
+    return composed;
 }
 
-vector<string> Visible::SplitWords(string paragraph) {
-    vector<string> splitWords;
+std::vector<std::string> Visible::SplitWords(std::string paragraph) {
+    std::vector<std::string> splitWords;
     int i = 0;
     while (true) {
         int index = (int)paragraph.find(' ', i);
@@ -61,16 +54,15 @@ vector<string> Visible::SplitWords(string paragraph) {
             return splitWords;        
         }
 
-        string word = paragraph.substr(i, index - i);
+        std::string word = paragraph.substr(i, index - i);
         char next = paragraph.substr(index, 1)[0];
 
        if (next == ' ' || next == '\t') {
             splitWords.push_back(word);
-            string s(1, next);
+            std::string s(1, next);
             splitWords.push_back(s);
         }
 
         i = index + 1;
     }
-    return splitWords;
 }

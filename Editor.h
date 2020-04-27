@@ -12,7 +12,7 @@
 using namespace std;
 
 //class Editor;   // forward declaration because Editor is in ECTextDocumentCtrl
-class Visible;
+//class Visible;
 
 class ECTextDocumentCtrl
 {

@@ -62,15 +62,13 @@ Editor::Editor(string name) /*: docCtrl(*this)*/ {
         this->SetCursor(0, 0);              // set the cursor
     }
 
-    //Visible vis(wndRows, wndCols, text, wnd);
-
     /*
     // add the lines in the editor to the window
     for (auto line : text)
         wnd.AddRow(line);
     */
     vis.Compose(text);
-    
+
     wnd.Attach(this);   // attach this editor to the window
     wnd.Show();         // start the editor
 }
@@ -100,12 +98,6 @@ void Editor::Update() {
         CharHandle(keyPressed);
     }
     
-    /*
-    // refresh the window after changes have been made
-    wnd.InitRows();
-    for (auto line : text)
-        wnd.AddRow(line);
-    */
     vis.Compose(text);
 }
 

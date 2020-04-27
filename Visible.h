@@ -1,25 +1,26 @@
 #ifndef Visible_h
 #define Visible_h
 
-#include "Editor.h"
-
-using namespace std;
+#include "ECTextViewImp.h"
+#include <iostream>
+#include <string>
+#include <vector>
 
 class Paragraph;
 
 class Visible {
 public:
-    Visible(int rows, int cols, vector<string> text, ECTextViewImp& wnd);
+    Visible(int rows, int cols, std::vector<std::string> text, ECTextViewImp &wnd);
     ~Visible() {}
 
-    void Compose(vector<string> text);
-    vector<string> ComposeParagraph(string paragraph);
-    vector<string> SplitWords(string paragraph);
+    void Compose(std::vector<std::string> text);
+    std::vector<std::string> ComposeParagraph(std::string paragraph);
+    std::vector<std::string> SplitWords(std::string paragraph);
 private:
-    ECTextViewImp &wnd;
-    vector<string> paragraphs;
     int height;
     int width;
+    std::vector<std::string> paragraphs;
+    ECTextViewImp &_wnd;
 };
 
 #endif
