@@ -8,7 +8,7 @@ Visible::Visible(int rows, int cols, std::vector<std::string> text, ECTextViewIm
 
 void Visible::Compose(std::vector<std::string> text) {
     paragraphs = text;
-    std::vector<std::string> wrappedText;
+    wrappedText.clear();
     for (auto paragraph : paragraphs) {
         if (paragraph.length() <= width) {
             wrappedText.push_back(paragraph);
@@ -33,7 +33,7 @@ std::vector<std::string> Visible::ComposeParagraph(std::string paragraph) {
 
     for (int i = 0; i < splitWords.size(); i++) {
         std::string word = splitWords[i];
-        if (currLength + word.length() > width) {
+        if (currLength + word.length() >= width) {
             composed.push_back("");
             currLength = 0;
             currLine += 1;
@@ -65,4 +65,8 @@ std::vector<std::string> Visible::SplitWords(std::string paragraph) {
 
         i = index + 1;
     }
+}
+
+std::vector<std::string> Visible::GetViewText() {
+    return wrappedText;
 }

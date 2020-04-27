@@ -16,10 +16,13 @@ public:
     void Compose(std::vector<std::string> text);
     std::vector<std::string> ComposeParagraph(std::string paragraph);
     std::vector<std::string> SplitWords(std::string paragraph);
+
+    std::vector<std::string> GetViewText();
 private:
     int height;
     int width;
     std::vector<std::string> paragraphs;
+    std::vector<std::string> wrappedText;
     ECTextViewImp &_wnd;
 };
 
