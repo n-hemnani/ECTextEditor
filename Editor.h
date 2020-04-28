@@ -53,7 +53,8 @@ public:
     void InsertRowAt(int yPos, std::string _row_deleted, int row_length);   // insert a specific row
     
     std::vector<std::string> GetText(); // return text
-    
+    std::vector<std::string> GetViewText();
+    int GetViewCols();
 private:
     ECTextViewImp wnd;                  // window/subject
     ECTextDocumentCtrl docCtrl;         // document controller
@@ -65,6 +66,8 @@ private:
     int wndRows = wnd.GetRowNumInView();
     int wndCols = wnd.GetColNumInView();
     Visible vis = Visible(wndRows, wndCols, text, wnd);
+    std::vector<std::string> viewText;
+    int rowsInView = (int)viewText.size();
     string nameoffile;                  // filename to read/write to
 };
 

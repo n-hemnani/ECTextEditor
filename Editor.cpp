@@ -61,6 +61,8 @@ Editor::Editor(string name) /*: docCtrl(*this)*/ {
 
     this->SetCursor(0, 0);              // set the cursor
     vis.Compose(text);
+    viewText = vis.GetViewText();
+    rowsInView = (int)viewText.size();
 
     wnd.Attach(this);   // attach this editor to the window
     wnd.Show();         // start the editor
@@ -69,6 +71,9 @@ Editor::Editor(string name) /*: docCtrl(*this)*/ {
 // function called by window using Notify()
 void Editor::Update() {
     keyPressed = wnd.GetPressedKey();   // obtain the key
+
+    viewText = vis.GetViewText();
+    rowsInView = (int)viewText.size();
 
     if (keyPressed >= 1000 && keyPressed <= 1003) {     // arrow
         ArrowHandle(keyPressed);
@@ -134,7 +139,9 @@ void Editor::InsertRowAt(int yPos, std::string _row_deleted, int row_length) {
 
 std::vector<std::string> Editor::GetText() { return text; }
 
+std::vector<std::string> Editor::GetViewText() { return viewText; }
 
+int Editor::GetViewCols() { return wndCols; }
 
 
 
@@ -147,9 +154,6 @@ void Editor::ArrowHandle(int keyPressed) {
     
     cX = wnd.GetCursorX();  // get the x-position of the cursor 
     cY = wnd.GetCursorY();  // get the y-position of the cursor
-
-    std::vector<std::string> viewText = vis.GetViewText();
-    int rowsInView = (int)viewText.size();
 
     // these if-statments basically check if the key is left, right, up, or down,
     // and then moves the cursor while making sure the new position is valid.

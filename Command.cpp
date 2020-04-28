@@ -52,13 +52,42 @@ InsertCommand::InsertCommand(int cX, int cY, int keyPressed, Editor &editor):
 InsertCommand :: ~InsertCommand() { delete this; }
 
 void InsertCommand::Execute() {
-    _editor.InsertCharAt(_cX, _cY, static_cast<char>(_key));
-    _editor.SetCursor(_cX + 1, _cY);
+    int length = _cX;
+    for (int i = 0; i < _cY; i++)
+        length += (int)_editor.GetViewText()[i].size();
+    
+    trueY = 0;
+    int sum = 0;
+    if (_cX == 0) {
+        while (sum + _editor.GetText()[trueY].size() <= length && trueY < _cY) {
+            sum += (int)_editor.GetText()[trueY].size();
+            trueY++;
+        }
+        trueX = length - sum;
+    } else {
+        while (sum + _editor.GetText()[trueY].size() < length) {
+            sum += (int)_editor.GetText()[trueY].size();
+            trueY++;
+        }
+        trueX = length - sum;
+    }
+
+    _editor.InsertCharAt(trueX, trueY, static_cast<char>(_key));
+
+    if (_cX == _editor.GetViewCols()) {
+        if (_editor.GetViewText()[_cY + 1][0] != ' ') {
+            _editor.SetCursor(_editor.GetViewText()[_cY + 1].find(' ', 0) + 1, _cY + 1);
+        } else {
+            _editor.SetCursor(_editor.GetViewText()[_cY + 1].find(' ', 1) + 1, _cY + 1);
+        }
+    } else {
+        _editor.SetCursor(_cX + 1, _cY);
+    }
 }
 
 void InsertCommand::UnExecute() {
     _editor.SetCursor(_cX, _cY);
-    _editor.RemoveCharAt(_cX, _cY);
+    _editor.RemoveCharAt(trueX, trueY);
 }
 
 // RemoveCommand
@@ -71,13 +100,15 @@ RemoveCommand::RemoveCommand(int cX, int cY, Editor &editor):
 RemoveCommand :: ~RemoveCommand() { delete this; }
 
 void RemoveCommand::Execute() {
-    _key_deleted = _editor.GetText()[_cY][_cX - 1];
+
+
+    _key_deleted = _editor.GetText()[trueY][trueX - 1];
     _editor.SetCursor(_cX - 1, _cY);
-    _editor.RemoveCharAt(_cX - 1, _cY);
+    _editor.RemoveCharAt(trueX - 1, trueY);
 }
 
 void RemoveCommand::UnExecute() {
-    _editor.InsertCharAt(_cX - 1, _cY, _key_deleted);
+    _editor.InsertCharAt(trueX - 1, trueY, _key_deleted);
     _editor.SetCursor(_cX, _cY);
 }
 

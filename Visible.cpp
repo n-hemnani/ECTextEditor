@@ -57,7 +57,7 @@ std::vector<std::string> Visible::SplitWords(std::string paragraph) {
         std::string word = paragraph.substr(i, index - i);
         char next = paragraph.substr(index, 1)[0];
 
-       if (next == ' ' || next == '\t') {
+        if (next == ' ' || next == '\t') {
             splitWords.push_back(word);
             std::string s(1, next);
             splitWords.push_back(s);
