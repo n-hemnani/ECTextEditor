@@ -10,7 +10,7 @@ void Visible::Compose(std::vector<std::string> text) {
     paragraphs = text;
     wrappedText.clear();
     for (auto paragraph : paragraphs) {
-        if (paragraph.length() <= width) {
+        if (paragraph.length() < width - 1) {
             wrappedText.push_back(paragraph);
         } else {
             std::vector<std::string> wrappedParagraph = this->ComposeParagraph(paragraph);

@@ -65,7 +65,7 @@ void InsertCommand::Execute() {
         }
         trueX = length - sum;
     } else {
-        while (sum + _editor.GetText()[trueY].size() < length) {
+        while (sum + _editor.GetText()[trueY].size() < length && trueY < _cY) {
             sum += (int)_editor.GetText()[trueY].size();
             trueY++;
         }
@@ -73,13 +73,10 @@ void InsertCommand::Execute() {
     }
 
     _editor.InsertCharAt(trueX, trueY, static_cast<char>(_key));
+    _editor.Compose();
 
-    if (_cX == _editor.GetViewCols()) {
-        if (_editor.GetViewText()[_cY + 1][0] != ' ') {
-            _editor.SetCursor(_editor.GetViewText()[_cY + 1].find(' ', 0) + 1, _cY + 1);
-        } else {
-            _editor.SetCursor(_editor.GetViewText()[_cY + 1].find(' ', 1) + 1, _cY + 1);
-        }
+    if (_cX == _editor.GetViewCols() - 1) {
+        _editor.SetCursor(_editor.GetViewText()[_cY + 1].find(static_cast<char>(_key)) + 1, _cY + 1);
     } else {
         _editor.SetCursor(_cX + 1, _cY);
     }
@@ -100,7 +97,25 @@ RemoveCommand::RemoveCommand(int cX, int cY, Editor &editor):
 RemoveCommand :: ~RemoveCommand() { delete this; }
 
 void RemoveCommand::Execute() {
-
+    int length = _cX;
+    for (int i = 0; i < _cY; i++)
+        length += (int)_editor.GetViewText()[i].size();
+    
+    trueY = 0;
+    int sum = 0;
+    if (_cX == 0) {
+        while (sum + _editor.GetText()[trueY].size() <= length && trueY < _cY) {
+            sum += (int)_editor.GetText()[trueY].size();
+            trueY++;
+        }
+        trueX = length - sum;
+    } else {
+        while (sum + _editor.GetText()[trueY].size() < length) {
+            sum += (int)_editor.GetText()[trueY].size();
+            trueY++;
+        }
+        trueX = length - sum;
+    }
 
     _key_deleted = _editor.GetText()[trueY][trueX - 1];
     _editor.SetCursor(_cX - 1, _cY);

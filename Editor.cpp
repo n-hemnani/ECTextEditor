@@ -60,9 +60,7 @@ Editor::Editor(string name) /*: docCtrl(*this)*/ {
     }
 
     this->SetCursor(0, 0);              // set the cursor
-    vis.Compose(text);
-    viewText = vis.GetViewText();
-    rowsInView = (int)viewText.size();
+    this->Compose();
 
     wnd.Attach(this);   // attach this editor to the window
     wnd.Show();         // start the editor
@@ -95,8 +93,8 @@ void Editor::Update() {
     } else {                                            // insert character
         CharHandle(keyPressed);
     }
-    
-    vis.Compose(text);
+
+    this->Compose();
 }
 
 // set the cursor
@@ -142,6 +140,12 @@ std::vector<std::string> Editor::GetText() { return text; }
 std::vector<std::string> Editor::GetViewText() { return viewText; }
 
 int Editor::GetViewCols() { return wndCols; }
+
+void Editor::Compose() { 
+    vis.Compose(text);
+    viewText = vis.GetViewText();
+    rowsInView = (int)viewText.size();
+}
 
 
 
