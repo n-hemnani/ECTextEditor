@@ -60,8 +60,8 @@ public:
     void Execute();
     void UnExecute();
 private:
-    int _cX, _cY, _row_length;
-    int trueX, trueY;
+    int _cY, _row_length;
+    int trueY;
     std::string _row_deleted;
     Editor &_editor;
 };
@@ -74,7 +74,7 @@ public:
     void UnExecute();
 private:
     int _cX, _cY, _row_length;
-    // int trueX, trueY;
+    int trueX, trueY;
     std::string _row_entered;
     Editor &_editor;
 };

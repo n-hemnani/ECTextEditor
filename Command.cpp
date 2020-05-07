@@ -125,8 +125,7 @@ void RemoveCommand::UnExecute() {
 }
 
 // RowBackspaceCommand
-RowBackspaceCommand::RowBackspaceCommand(int cX, int cY, Editor &editor): 
-    _cX(cX),
+RowBackspaceCommand::RowBackspaceCommand(int cX, int cY, Editor &editor):
     _cY(cY),
     _editor(editor)
 {};
@@ -168,18 +167,40 @@ EnterCommand::EnterCommand(int cX, int cY, Editor &editor):
 EnterCommand :: ~EnterCommand() { delete this; }
 
 void EnterCommand::Execute() {
-    if (_cX == (int)_editor.GetText()[_cY].size()) {
+    int length = _cX;
+    for (int i = 0; i < _cY; i++)
+        length += (int)_editor.GetViewText()[i].size();
+    
+    trueY = 0;
+    int sum = 0;
+    if (_cX == 0) {
+        while (sum + _editor.GetText()[trueY].size() <= length && trueY < _cY) {
+            sum += (int)_editor.GetText()[trueY].size();
+            trueY++;
+        }
+        trueX = length - sum;
+    } else {
+        while (sum + _editor.GetText()[trueY].size() < length && trueY < _cY) {
+            sum += (int)_editor.GetText()[trueY].size();
+            trueY++;
+        }
+        trueX = length - sum;
+    }
+
+    if (trueX == (int)_editor.GetText()[trueY].size()) {
         _row_entered = "";
         _row_length = 0;
     } else {
-        _row_entered = _editor.GetText()[_cY].substr(_cX, (int)_editor.GetText()[_cY].size());
+        _row_entered = _editor.GetText()[trueY].substr(trueX, (int)_editor.GetText()[trueY].size());
         _row_length = (int)_row_entered.size();
     }
-    _editor.InsertRowAt(_cY + 1, _row_entered, _row_length);
-    _editor.SetCursor(0, _cY + 1);
+    
+    _editor.InsertRowAt(trueY + 1, _row_entered, _row_length);
+    _editor.Compose();
+    _editor.ComposeCursor(length);
 }
 
 void EnterCommand::UnExecute() {
-    _editor.RemoveRowAt(_cY + 1);
+    _editor.RemoveRowAt(trueY + 1);
     _editor.SetCursor(_cX, _cY);
 }
