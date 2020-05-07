@@ -6,7 +6,7 @@
 #include <string>
 #include <vector>
 
-class Paragraph;
+class Editor;
 
 class Visible {
 public:
@@ -16,6 +16,8 @@ public:
     void Compose(std::vector<std::string> text);
     std::vector<std::string> ComposeParagraph(std::string paragraph);
     std::vector<std::string> SplitWords(std::string paragraph);
+
+    void ComposeCursor(int length, Editor &editor);
 
     std::vector<std::string> GetViewText();
 private:

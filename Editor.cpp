@@ -147,6 +147,10 @@ void Editor::Compose() {
     rowsInView = (int)viewText.size();
 }
 
+ void Editor::ComposeCursor(int length) {
+     vis.ComposeCursor(length, *this);
+ }
+
 
 
 // ***************************************************************
@@ -209,8 +213,23 @@ void Editor::EnterHandle() {
 void Editor::BackspaceHandle() {
     if (cY > 0 || cX > 0) {
         if (cX == 0) {
-            // delete this row and merge it with the one above
-            docCtrl.RemoveRowAt(cX, cY, *this);
+            // delete character at the beginning of the row (and merge paragraph if needed)
+            int length = 0;
+            for (int i = 0; i < cY; i++)
+                length += (int)GetViewText()[i].size();
+            
+            int trueY = 0;
+            int sum = 0;
+            while (sum + GetText()[trueY].size() <= length) {
+                sum += (int)GetText()[trueY].size();
+                trueY++;
+            }
+
+            if (length - sum == 0) {
+                docCtrl.RemoveRowAt(cX, cY, *this);
+            } else {
+                docCtrl.RemoveTextAt(cX, cY, *this);
+            }
         } else {
             // delete a character
             docCtrl.RemoveTextAt(cX, cY, *this);

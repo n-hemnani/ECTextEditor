@@ -1,4 +1,5 @@
 #include "Visible.h"
+#include "Editor.h"
 
 Visible::Visible(int rows, int cols, std::vector<std::string> text, ECTextViewImp &wnd) :
     height(rows),
@@ -65,6 +66,21 @@ std::vector<std::string> Visible::SplitWords(std::string paragraph) {
 
         i = index + 1;
     }
+}
+
+void Visible::ComposeCursor(int length, Editor &editor) {
+    Editor &_editor = editor;
+    int y = 0;
+    int x = 0;
+    int i = 0;
+    while (length >= (int)wrappedText[i].size()) {
+        length -= (int)wrappedText[i].size();
+        i++;
+        y++;
+    }
+    x = length;
+
+    _editor.SetCursor(x, y);
 }
 
 std::vector<std::string> Visible::GetViewText() {

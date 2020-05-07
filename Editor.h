@@ -56,6 +56,8 @@ public:
     std::vector<std::string> GetViewText();
     int GetViewCols();
     void Compose();
+    void ComposeCursor(int length);
+
 private:
     ECTextViewImp wnd;                  // window/subject
     ECTextDocumentCtrl docCtrl;         // document controller

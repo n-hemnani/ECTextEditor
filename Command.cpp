@@ -74,12 +74,7 @@ void InsertCommand::Execute() {
 
     _editor.InsertCharAt(trueX, trueY, static_cast<char>(_key));
     _editor.Compose();
-
-    if (_cX == _editor.GetViewCols() - 1) {
-        _editor.SetCursor(_editor.GetViewText()[_cY + 1].find(static_cast<char>(_key)) + 1, _cY + 1);
-    } else {
-        _editor.SetCursor(_cX + 1, _cY);
-    }
+    _editor.ComposeCursor(length + 1);
 }
 
 void InsertCommand::UnExecute() {
@@ -110,7 +105,7 @@ void RemoveCommand::Execute() {
         }
         trueX = length - sum;
     } else {
-        while (sum + _editor.GetText()[trueY].size() < length) {
+        while (sum + _editor.GetText()[trueY].size() <= length) {
             sum += (int)_editor.GetText()[trueY].size();
             trueY++;
         }
@@ -118,8 +113,10 @@ void RemoveCommand::Execute() {
     }
 
     _key_deleted = _editor.GetText()[trueY][trueX - 1];
-    _editor.SetCursor(_cX - 1, _cY);
+
     _editor.RemoveCharAt(trueX - 1, trueY);
+    _editor.Compose();
+    _editor.ComposeCursor(length - 1);
 }
 
 void RemoveCommand::UnExecute() {
@@ -137,17 +134,27 @@ RowBackspaceCommand::RowBackspaceCommand(int cX, int cY, Editor &editor):
 RowBackspaceCommand :: ~RowBackspaceCommand() { delete this; }
 
 void RowBackspaceCommand::Execute() {
-    _row_deleted = _editor.GetText()[_cY];
-    _row_length = (int)_row_deleted.size();
-
-    _cX = (int)_editor.GetText()[_cY - 1].size();
-    _editor.SetCursor(_cX, _cY - 1);
+    int length = 0;
+    for (int i = 0; i < _cY; i++)
+        length += (int)_editor.GetViewText()[i].size();
     
-    _editor.RemoveRowAt(_cY);
+    trueY = 0;
+    int sum = 0;
+    while (sum + _editor.GetText()[trueY].size() <= length) {
+        sum += (int)_editor.GetText()[trueY].size();
+        trueY++;
+    }
+
+    _row_deleted = _editor.GetText()[trueY];
+    _row_length = (int)_row_deleted.size();
+    
+    _editor.RemoveRowAt(trueY);
+    _editor.Compose();
+    _editor.ComposeCursor(length);
 }
 
 void RowBackspaceCommand::UnExecute() {
-    _editor.InsertRowAt(_cY, _row_deleted, _row_length);
+    _editor.InsertRowAt(trueY, _row_deleted, _row_length);
     _editor.SetCursor(0, _cY);
 }
 
