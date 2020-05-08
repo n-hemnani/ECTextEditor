@@ -71,7 +71,7 @@ void InsertCommand::Execute() {
         }
         trueX = length - sum;
     }
-
+    
     _editor.InsertCharAt(trueX, trueY, static_cast<char>(_key));
     _editor.Compose();
     _editor.ComposeCursor(length + 1);
@@ -105,7 +105,7 @@ void RemoveCommand::Execute() {
         }
         trueX = length - sum;
     } else {
-        while (sum + _editor.GetText()[trueY].size() <= length) {
+        while (sum + _editor.GetText()[trueY].size() < length && trueY < _cY) {
             sum += (int)_editor.GetText()[trueY].size();
             trueY++;
         }
@@ -116,7 +116,11 @@ void RemoveCommand::Execute() {
 
     _editor.RemoveCharAt(trueX - 1, trueY);
     _editor.Compose();
-    _editor.ComposeCursor(length - 1);
+    if (trueX == _editor.GetText()[trueY].size() + 1) {
+        _editor.SetCursor(_cX - 1, _cY);
+    } else {
+        _editor.ComposeCursor(length - 1);
+    }
 }
 
 void RemoveCommand::UnExecute() {
@@ -139,12 +143,16 @@ void RowBackspaceCommand::Execute() {
     
     trueY = 0;
     int sum = 0;
-    while (sum + _editor.GetText()[trueY].size() <= length) {
+    while (sum + _editor.GetText()[trueY].size() <= length && trueY < _editor.GetText().size()) {
         sum += (int)_editor.GetText()[trueY].size();
         trueY++;
     }
 
-    _row_deleted = _editor.GetText()[trueY];
+    try {
+        _row_deleted = _editor.GetText()[trueY];
+    } catch (...) {
+        _row_deleted = " ";
+    }
     _row_length = (int)_row_deleted.size();
     
     _editor.RemoveRowAt(trueY);
@@ -187,8 +195,8 @@ void EnterCommand::Execute() {
         trueX = length - sum;
     }
 
-    if (trueX == (int)_editor.GetText()[trueY].size()) {
-        _row_entered = "";
+    if (trueX == _editor.GetText()[trueY].size() - 1) {
+        _row_entered = " ";
         _row_length = 0;
     } else {
         _row_entered = _editor.GetText()[trueY].substr(trueX, (int)_editor.GetText()[trueY].size());
@@ -197,7 +205,12 @@ void EnterCommand::Execute() {
     
     _editor.InsertRowAt(trueY + 1, _row_entered, _row_length);
     _editor.Compose();
-    _editor.ComposeCursor(length);
+    if (trueX == _editor.GetText()[trueY].size()) {
+        _editor.SetCursor(0, _cY + 1);
+    } else {
+        _editor.ComposeCursor(length);
+    }
+    //_editor.ComposeCursor(length);
 }
 
 void EnterCommand::UnExecute() {

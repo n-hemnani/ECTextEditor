@@ -73,7 +73,7 @@ void Visible::ComposeCursor(int length, Editor &editor) {
     int y = 0;
     int x = 0;
     int i = 0;
-    while (length >= (int)wrappedText[i].size()) {
+    while (length > (int)wrappedText[i].size()) {
         length -= (int)wrappedText[i].size();
         i++;
         y++;

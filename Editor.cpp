@@ -59,6 +59,8 @@ Editor::Editor(string name) /*: docCtrl(*this)*/ {
         this->InsertRow("");                // initialize it to empty text
     }
 
+    this->InsertRow("");
+
     this->SetCursor(0, 0);              // set the cursor
     this->Compose();
 
@@ -123,7 +125,8 @@ void Editor::InsertRow(std::string line) {
 
 // function used for backspace / enter when merging two rows
 void Editor::RemoveRowAt(int yPos) {
-    text[yPos - 1] += text[yPos];
+    if (text[yPos].size() != 0)
+        text[yPos - 1] += text[yPos];
     text.erase(text.begin() + yPos);
     numRows -= 1;
 }
