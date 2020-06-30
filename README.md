@@ -1,6 +1,8 @@
 # ECTextEditor
 
-This project is a basic text editor that can take in a file (or create one) and add/remove/edit text, and then save it back to the file. The text editor automatically wraps paragraphs if they get too long for one line, but doesn’t support multiple pages (I wasn’t able to implement that). With this text editor, one can add and remove basic text, but also add, remove, and merge paragraphs. There are a few bugs, but the code works fine for the most part (I struggled with adding text to blank lines and deleting blank lines).  
+This project is a basic text editor that can take in a file (or create one) and add/remove/edit text, and then save it back to the file. The text editor automatically wraps paragraphs if they get too long for one line, but doesn’t support multiple pages. With this text editor, one can add and remove basic text, but also add, remove, and merge paragraphs. There are a few bugs, but the code works fine for the most part (I struggled with deleting blank lines).
+
+I made this project for a C++ class I took my sophomore year.
 
 User Guide:  
 1. Navigate to the project directory.  
